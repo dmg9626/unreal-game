@@ -34,11 +34,19 @@ public:
 	UPROPERTY(BlueprintReadWrite, Category = Grapple);
 	FVector GrappleAxis;
 
+	// Current distance from GrapplePoint
 	float GrappleDistance;
+
+	// Scalar value applied to player velocity when launching out of a swing
+	UPROPERTY(EditAnywhere, Category = Grapple);
+	float GrappleReleaseBoost{ 100.0f };
 
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+
+	UPROPERTY(BlueprintReadOnly, Category = Grapple);
+	FVector LastPosition;
 
 public:	
 	// Called every frame
