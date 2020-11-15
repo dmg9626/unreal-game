@@ -1,6 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
+#define print(text) if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 1.5, FColor::Green,text)
+#define printFString(text, fstring) if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Magenta, FString::Printf(TEXT(text), fstring))
 #include "GrappleCharacter.h"
 
 // Sets default values
@@ -23,19 +24,26 @@ void AGrappleCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	//printFString("%s", *GetActorForwardVector().ToString());
 }
 
-void AGrappleCharacter::Grapple(FVector GrapplePoint, float DeltaTime)
+void AGrappleCharacter::Grapple(float DeltaTime)
 {
-	// Get vector from target to self
-	FVector delta = GetActorLocation() - GrapplePoint;
+	// Get (unit) vector from target to self
+	FVector unitDelta = (GetActorLocation() - GrapplePoint).GetSafeNormal();
 
 	// Rotate delta vector around our up axis
-	FVector newDelta = delta.RotateAngleAxis(SwingSpeed * DeltaTime, GetActorRightVector());
+	FVector unitRevolvedDelta = unitDelta.RotateAngleAxis(SwingSpeed * DeltaTime, GrappleAxis);
 
 	// Calculate new position relative to target
-	FVector newPosition = newDelta + GrapplePoint;
+	FVector newPosition = (unitRevolvedDelta * GrappleDistance) + GrapplePoint;
 	SetActorLocation(newPosition);
+}
+
+FVector AGrappleCharacter::CalculateGrappleAxis(FVector vToGrapplePoint)
+{
+	FVector axis = FVector::CrossProduct(GetActorForwardVector(), vToGrapplePoint);
+	return axis.GetSafeNormal();
 }
 
 FHitResult AGrappleCharacter::TryGrapple()
@@ -60,6 +68,16 @@ FHitResult AGrappleCharacter::TryGrapple()
 
 	// Perform raycast and return hit result
 	GetWorld()->LineTraceSingleByChannel(hit, traceStart, traceEnd, ECC_Visibility, traceParams);
+
+	if (hit.bBlockingHit)
+	{
+		// Update grapple settings
+		GrapplePoint = hit.Location;
+		GrappleAxis = CalculateGrappleAxis(traceDirection.Vector());
+		//GrappleAxis = GetActorRightVector();
+		GrappleDistance = hit.Distance;
+	}
+
 	return hit;
 }
 

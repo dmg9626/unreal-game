@@ -21,8 +21,20 @@ public:
 	UPROPERTY(EditAnywhere, Category = Grapple);
 	float GrappleRange{ 1000.0f };
 
-	UPROPERTY(BlueprintReadOnly, Category = Grapple);
+	UPROPERTY(BlueprintReadWrite, Category = Grapple);
 	bool IsGrappling{ false };
+
+	// True when player is in the air and can double jump
+	UPROPERTY(BlueprintReadWrite, Category = Grapple);
+	bool CanDoubleJump{ false };
+
+	UPROPERTY(BlueprintReadWrite, Category = Grapple);
+	FVector GrapplePoint;
+
+	UPROPERTY(BlueprintReadWrite, Category = Grapple);
+	FVector GrappleAxis;
+
+	float GrappleDistance;
 
 protected:
 	// Called when the game starts or when spawned
@@ -33,7 +45,9 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	UFUNCTION(BlueprintCallable, Category="Grapple")
-	void Grapple(FVector GrapplePoint, float DeltaTime);
+	void Grapple(float DeltaTime);
+
+	FVector CalculateGrappleAxis(FVector vToGrapplePoint);
 
 	/* Returns raycast hit result for a grapple target within GrappleRange in player-facing direction */
 	UFUNCTION(BlueprintCallable, Category = "Grapple")
