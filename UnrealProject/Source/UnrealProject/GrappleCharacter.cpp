@@ -29,6 +29,9 @@ void AGrappleCharacter::Tick(float DeltaTime)
 
 void AGrappleCharacter::Grapple(float DeltaTime)
 {
+	// Store position from last frame (so we can track player velocity)
+	LastPosition = GetActorLocation();
+
 	// Get (unit) vector from target to self
 	FVector unitDelta = (GetActorLocation() - GrapplePoint).GetSafeNormal();
 
