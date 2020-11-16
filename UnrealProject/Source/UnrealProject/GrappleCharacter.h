@@ -21,6 +21,7 @@ public:
 	UPROPERTY(EditAnywhere, Category = Grapple);
 	float GrappleRange{ 1000.0f };
 
+	// Controls whether Grapple() is called each tick
 	UPROPERTY(BlueprintReadWrite, Category = Grapple);
 	bool IsGrappling{ false };
 
@@ -38,7 +39,7 @@ public:
 	float GrappleDistance;
 
 	// Scalar value applied to player velocity when launching out of a swing
-	UPROPERTY(EditAnywhere, Category = Grapple);
+	UPROPERTY(BlueprintReadWrite, Category = Grapple);
 	float GrappleReleaseBoost{ 100.0f };
 
 protected:
@@ -52,7 +53,6 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	UFUNCTION(BlueprintCallable, Category="Grapple")
 	void Grapple(float DeltaTime);
 
 	FVector CalculateGrappleAxis(FVector vToGrapplePoint);

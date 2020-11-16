@@ -25,6 +25,10 @@ void AGrappleCharacter::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	//printFString("%s", *GetActorForwardVector().ToString());
+	if (IsGrappling)
+	{
+		Grapple(DeltaTime);
+	}
 }
 
 void AGrappleCharacter::Grapple(float DeltaTime)
