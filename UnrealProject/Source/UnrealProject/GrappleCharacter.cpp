@@ -46,11 +46,20 @@ FVector AGrappleCharacter::CalculateTensionForce()
 	float dot = FVector::DotProduct(hookToPlayer, GetVelocity());
 
 	// Scale hookToPlayer's length to resulting dot product
-	hookToPlayer = hookToPlayer.GetSafeNormal() * dot;
+	FVector scaledByDot = hookToPlayer.GetSafeNormal() * dot;
 
 	// Reverse direction and scale by this force's weight
-	FVector grappleTension = -hookToPlayer;
-	return grappleTension * GrappleTensionWeight;
+	FVector grappleTension = -scaledByDot * GrappleTensionWeight;
+
+	// If tension force is pushing against player (happens when moving towards hook point)
+	float forceDirection = FVector::DotProduct(hookToPlayer, GetVelocity());
+	if (!FMath::IsNearlyZero(forceDirection) && forceDirection < 0)
+	{
+		// Scale force down by dampening factor
+		grappleTension /= InverseTensionDampeningFactor;
+	}
+
+	return grappleTension;
 }
 
 bool AGrappleCharacter::TryGrapple()

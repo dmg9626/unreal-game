@@ -18,16 +18,24 @@ public:
 	UPROPERTY(EditAnywhere, Category = Grapple);
 	float GrappleRange{ 1000.0f };
 
+	// Controls strength of tension force during grappling.
 	UPROPERTY(EditAnywhere, Category = Grapple);
 	float GrappleTensionWeight{ 2.0f };
 
+	// Controls amount of forward momentum applied during swinging.
+	// Generally, higher value = higher acceleration
 	UPROPERTY(EditAnywhere, Category = Grapple);
 	float ForwardMomentumWeight{ 70000.0f };
 
+	// Radius of sphere used to find grapple hit results. 
+	// Larger radius = more lenient, smaller = more precise
 	UPROPERTY(EditAnywhere, Category = Grapple);
 	float SphereTraceRadius{ 15.0f };
 
-	
+	// Factor by which to reduce tension force pushing against the player (i.e. "pole-vaulting" effect).
+	// Higher value => smaller force
+	UPROPERTY(EditAnywhere, Category = Grapple);
+	float InverseTensionDampeningFactor{ 2.0f };
 
 protected:
 	// Called when the game starts or when spawned
@@ -40,6 +48,7 @@ protected:
 
 	UPROPERTY(BlueprintReadOnly, Category = Grapple);
 	FVector GrapplePoint;
+
 	// Calculates force of grapple tension
 	FVector CalculateTensionForce();
 
