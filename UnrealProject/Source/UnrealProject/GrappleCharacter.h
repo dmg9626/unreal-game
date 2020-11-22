@@ -63,6 +63,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Grapple")
 	FVector CalculateGrappleForce();
 
+	UFUNCTION(BlueprintCallable, Category = "UI")
+	bool CursorTargetInRange();
+
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 

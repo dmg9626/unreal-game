@@ -37,6 +37,24 @@ FVector AGrappleCharacter::CalculateGrappleForce()
 	return grappleTension + forwardMomentum;
 }
 
+bool AGrappleCharacter::CursorTargetInRange()
+{
+	FHitResult hit(ForceInit);
+
+	// Initialize raycast values from player perspective
+	FVector traceStart;
+	FRotator traceDirection;
+
+	PlayerController->GetPlayerViewPoint(traceStart, traceDirection);
+	FVector traceEnd = traceStart + (traceDirection.Vector() * GrappleRange);
+
+	FCollisionQueryParams traceParams(SCENE_QUERY_STAT(TryGrapple), true, GetInstigator());
+
+	// Perform raycast and return hit result
+	GetWorld()->LineTraceSingleByChannel(hit, traceStart, traceEnd, ECC_Visibility, traceParams);
+	return hit.bBlockingHit;
+}
+
 FVector AGrappleCharacter::CalculateTensionForce()
 {
 	// Vector from hook point to player
