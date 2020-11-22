@@ -108,12 +108,17 @@ bool AGrappleCharacter::TryGrapple()
 
 	TArray<AActor*> actorsToIgnore{ this };
 	bool hitReturned = UKismetSystemLibrary::SphereTraceSingle(GetWorld(), traceStart, traceEnd, SphereTraceRadius,
-		UEngineTypes::ConvertToTraceType(ECC_Visibility), false, actorsToIgnore, EDrawDebugTrace::ForDuration, hit, true);
+		UEngineTypes::ConvertToTraceType(ECC_Visibility), false, actorsToIgnore, EDrawDebugTrace::None, hit, true);
 	
 	GrapplePoint = hit.ImpactPoint;
 	IsGrappling = hitReturned;
 
 	return hitReturned;
+}
+
+void AGrappleCharacter::SetJumpCurrentCount(int count)
+{
+	JumpCurrentCount = count;
 }
 
 // Called to bind functionality to input

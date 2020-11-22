@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "GameFramework/Character.h"
 #include "BouncePad.generated.h"
 
 UCLASS()
@@ -27,11 +28,16 @@ protected:
 	UPROPERTY(EditAnywhere, Category = BouncePad);
 	float ForwardBoost{ 1000.0f };
 
+	// When true, launches in direction of BouncePad's forward vector.
+	// When false, launches towards Player's forward vector
+	UPROPERTY(EditAnywhere, Category = BouncePad);
+	bool Directional;
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
 	// Returns vector used to launch player
 	UFUNCTION(BlueprintCallable, Category = BouncePad)
-	FVector GetLaunchVector();
+	FVector GetLaunchVector(ACharacter* character);
 };

@@ -1,6 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
+#define print(text) UE_LOG(LogTemp, Warning, TEXT(text))
+#define printFString(text, fstring) UE_LOG(LogTemp, Warning, TEXT(text), fstring)
 #include "BouncePad.h"
 
 // Sets default values
@@ -25,10 +26,33 @@ void ABouncePad::Tick(float DeltaTime)
 
 }
 
-FVector ABouncePad::GetLaunchVector()
+FVector ABouncePad::GetLaunchVector(ACharacter* character)
 {
-	FVector verticalForce = GetActorUpVector() * VerticalBoost;
-	FVector forwardForce = GetActorForwardVector() * ForwardBoost;
+	// Make sure we have a valid character reference
+	if (!character)
+	{
+		print("ERROR: BouncePad received null reference to character. Check the character blueprint to ensure the character is being plugged in as an argument to GetLaunchVector().");
+		return FVector::ZeroVector;
+	}
+
+	FVector verticalForce = FVector(1.0f) * VerticalBoost;
+	FVector forwardForce = FVector(1.0f) * ForwardBoost;
+
+	// Select orientation of forward force based on Directional setting
+	if (Directional)
+	{
+		// Use bounce pad's forward orientation
+		forwardForce *= GetActorForwardVector();
+	}
+	else
+	{
+		// Use character's forward orientation
+		forwardForce *= character->GetActorForwardVector();
+	}
+
+	// Always use bounce pad's local up vector (allows for angled bounce pads to behave like you'd expect)
+	verticalForce *= GetActorUpVector();
+
 	return verticalForce + forwardForce;
 }
 

@@ -63,6 +63,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Grapple")
 	FVector CalculateGrappleForce();
 
+	UFUNCTION(BlueprintCallable, Category = "Grapple")
+	void SetJumpCurrentCount(int count);
+
 	UFUNCTION(BlueprintCallable, Category = "UI")
 	bool CursorTargetInRange();
 
