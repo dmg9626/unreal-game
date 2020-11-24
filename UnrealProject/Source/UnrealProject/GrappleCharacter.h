@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "MovingGrappleComponent.h"
 #include "GrappleCharacter.generated.h"
 
 UCLASS()
@@ -14,6 +15,10 @@ class UNREALPROJECT_API AGrappleCharacter : public ACharacter
 public:
 	AGrappleCharacter();
 	//AGrappleCharacter(const FObjectInitializer& ObjectInitializer);
+
+	// Returns position grapple beam is currently hooked to
+	UPROPERTY(BlueprintReadOnly, Category = Grapple);
+	FVector GrapplePoint;
 
 	UPROPERTY(EditAnywhere, Category = Grapple);
 	float GrappleRange{ 1000.0f };
@@ -41,13 +46,14 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	UPROPERTY(BlueprintReadWrite, Category = Grapple);
+	UPROPERTY(BlueprintReadOnly, Category = Grapple);
 	bool IsGrappling{ false };
 	
 	APlayerController* PlayerController;
 
+	// Reference stored to MovingGrappleActor currently being grappled from, or nullptr
 	UPROPERTY(BlueprintReadOnly, Category = Grapple);
-	FVector GrapplePoint;
+	UMovingGrappleComponent* MovingGrappleComponent;
 
 public:	
 	// Called every frame
@@ -59,6 +65,10 @@ public:
 	/* Returns raycast hit result for a grapple target within GrappleRange in player-facing direction */
 	UFUNCTION(BlueprintCallable, Category = "Grapple")
 	FHitResult TryGrapple();
+
+	// Restores normal movement and clears grapple data (IsGrappling and MovingGrappleActor reference)
+	UFUNCTION(BlueprintCallable, Category = "Grapple")
+	void StopGrappling();
 
 	// Calculates force of tension resulting from grappling
 	UFUNCTION(BlueprintCallable, Category = "Grapple")
