@@ -49,19 +49,22 @@ protected:
 	UPROPERTY(BlueprintReadOnly, Category = Grapple);
 	FVector GrapplePoint;
 
-	// Calculates force of grapple tension
-	FVector CalculateTensionForce();
-
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+
 
 	/* Returns raycast hit result for a grapple target within GrappleRange in player-facing direction */
 	UFUNCTION(BlueprintCallable, Category = "Grapple")
 	bool TryGrapple();
 
+	// Calculates force of tension resulting from grappling
 	UFUNCTION(BlueprintCallable, Category = "Grapple")
-	FVector CalculateGrappleForce();
+	FVector CalculateTensionForce();
+	
+	// Returns forward momentum boost when pressing W while grappling
+	UFUNCTION(BlueprintCallable, Category = "Grapple")
+	FVector CalculateForwardForce();
 
 	UFUNCTION(BlueprintCallable, Category = "Grapple")
 	void SetJumpCurrentCount(int count);

@@ -26,17 +26,6 @@ void AGrappleCharacter::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 }
 
-FVector AGrappleCharacter::CalculateGrappleForce()
-{
-	// Calculate force of tension
-	FVector grappleTension = CalculateTensionForce();
-
-	// Add forward momentum
-	FVector forwardMomentum = GetActorForwardVector() * ForwardMomentumWeight;
-
-	return grappleTension + forwardMomentum;
-}
-
 bool AGrappleCharacter::CursorTargetInRange()
 {
 	FHitResult hit(ForceInit);
@@ -78,6 +67,11 @@ FVector AGrappleCharacter::CalculateTensionForce()
 	}
 
 	return grappleTension;
+}
+
+FVector AGrappleCharacter::CalculateForwardForce()
+{
+	return GetActorForwardVector() * ForwardMomentumWeight;
 }
 
 bool AGrappleCharacter::TryGrapple()
