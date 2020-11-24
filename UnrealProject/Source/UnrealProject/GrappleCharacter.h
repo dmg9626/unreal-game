@@ -53,10 +53,12 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	// Calculates start/end positions for trace operations
+	void GetTraceParameters(FVector& traceStart, FVector& traceEnd);
 
 	/* Returns raycast hit result for a grapple target within GrappleRange in player-facing direction */
 	UFUNCTION(BlueprintCallable, Category = "Grapple")
-	bool TryGrapple();
+	FHitResult TryGrapple();
 
 	// Calculates force of tension resulting from grappling
 	UFUNCTION(BlueprintCallable, Category = "Grapple")
@@ -69,8 +71,8 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Grapple")
 	void SetJumpCurrentCount(int count);
 
-	UFUNCTION(BlueprintCallable, Category = "UI")
-	bool CursorTargetInRange();
+	UFUNCTION(BlueprintCallable, Category = "Grapple")
+	FHitResult GetGrappleTarget(bool sphereTrace);
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
