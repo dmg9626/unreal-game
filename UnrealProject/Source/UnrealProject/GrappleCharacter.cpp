@@ -3,6 +3,7 @@
 #define print(text) UE_LOG(LogTemp, Warning, TEXT(text))
 #define printFString(text, fstring) UE_LOG(LogTemp, Warning, TEXT(text), fstring)
 #include "GrappleCharacter.h"
+#include "UObject/UObjectBaseUtility.h"
 #include "Kismet/KismetSystemLibrary.h"
 
 // Initialize with our custom CharacterMovementComponent
@@ -24,6 +25,12 @@ void AGrappleCharacter::BeginPlay()
 void AGrappleCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	// Update GrapplePoint if hooked onto a moving actor
+	if (MovingGrappleComponent)
+	{
+		GrapplePoint = MovingGrappleComponent->GetUpdatedGrapplePoint();
+	}
 }
 
 void AGrappleCharacter::GetTraceParameters(FVector &traceStart, FVector &traceEnd)
@@ -103,10 +110,29 @@ FHitResult AGrappleCharacter::TryGrapple()
 	// Try to find grapple target using sphere trace
 	FHitResult hit = GetGrappleTarget(true);
 	
+	// Store grapple point
 	GrapplePoint = hit.ImpactPoint;
 	IsGrappling = hit.bBlockingHit;
 
+	// If valid hit returned, check if it's a MovingGrappleActor
+	AActor* hitActor = hit.GetActor();
+	if (IsGrappling && hitActor != nullptr)
+	{
+		UActorComponent* component = hitActor->FindComponentByClass(UMovingGrappleComponent::StaticClass());
+		if (component)
+		{
+			MovingGrappleComponent = Cast<UMovingGrappleComponent>(component);
+		}
+	}
+
 	return hit;
+}
+
+void AGrappleCharacter::StopGrappling()
+{
+	// Clear grappling flag and MovingGrappleActor reference
+	IsGrappling = false;
+	MovingGrappleComponent = nullptr;
 }
 
 void AGrappleCharacter::SetJumpCurrentCount(int count)
