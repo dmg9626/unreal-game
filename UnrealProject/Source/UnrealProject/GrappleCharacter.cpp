@@ -3,6 +3,7 @@
 #define print(text) UE_LOG(LogTemp, Warning, TEXT(text))
 #define printFString(text, fstring) UE_LOG(LogTemp, Warning, TEXT(text), fstring)
 #include "GrappleCharacter.h"
+#include "UObject/UObjectBaseUtility.h"
 #include "Kismet/KismetSystemLibrary.h"
 
 // Initialize with our custom CharacterMovementComponent
@@ -24,35 +25,54 @@ void AGrappleCharacter::BeginPlay()
 void AGrappleCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	// Update GrapplePoint if hooked onto a moving actor
+	if (MovingGrappleComponent)
+	{
+		GrapplePoint = MovingGrappleComponent->GetUpdatedGrapplePoint();
+	}
 }
 
-FVector AGrappleCharacter::CalculateGrappleForce()
+void AGrappleCharacter::GetTraceParameters(FVector &traceStart, FVector &traceEnd)
 {
-	// Calculate force of tension
-	FVector grappleTension = CalculateTensionForce();
-
-	// Add forward momentum
-	FVector forwardMomentum = GetActorForwardVector() * ForwardMomentumWeight;
-
-	return grappleTension + forwardMomentum;
-}
-
-bool AGrappleCharacter::CursorTargetInRange()
-{
-	FHitResult hit(ForceInit);
-
 	// Initialize raycast values from player perspective
-	FVector traceStart;
 	FRotator traceDirection;
 
 	PlayerController->GetPlayerViewPoint(traceStart, traceDirection);
-	FVector traceEnd = traceStart + (traceDirection.Vector() * GrappleRange);
+	traceEnd = traceStart + (traceDirection.Vector() * GrappleRange);
+}
 
-	FCollisionQueryParams traceParams(SCENE_QUERY_STAT(TryGrapple), true, GetInstigator());
+FHitResult AGrappleCharacter::GetGrappleTarget(bool sphereTrace = false)
+{
+	FHitResult hit(ForceInit);
 
-	// Perform raycast and return hit result
-	GetWorld()->LineTraceSingleByChannel(hit, traceStart, traceEnd, ECC_Visibility, traceParams);
-	return hit.bBlockingHit;
+	// Find/validate player controller instance
+	if (!PlayerController)
+	{
+		return hit;
+	}
+
+	// Get start/end points
+	FVector traceStart, traceEnd;
+	GetTraceParameters(traceStart, traceEnd);
+
+	FCollisionQueryParams traceParams(SCENE_QUERY_STAT(GetGrappleTarget), true, GetInstigator());
+
+	// Only perform sphere trace if specified (more accurate, but less performant than line trace)
+	if (sphereTrace)
+	{
+		TArray<AActor*> actorsToIgnore{ this };
+		bool hitReturned = UKismetSystemLibrary::SphereTraceSingle(GetWorld(), traceStart, traceEnd, SphereTraceRadius,
+			UEngineTypes::ConvertToTraceType(ECC_Visibility), false, actorsToIgnore, EDrawDebugTrace::None, hit, true);
+	}
+	// Otherwise do linetrace
+	else
+	{
+		GetWorld()->LineTraceSingleByChannel(hit, traceStart, traceEnd, ECC_Visibility, traceParams);
+	}
+	
+	// Return hit result
+	return hit;
 }
 
 FVector AGrappleCharacter::CalculateTensionForce()
@@ -80,40 +100,39 @@ FVector AGrappleCharacter::CalculateTensionForce()
 	return grappleTension;
 }
 
-bool AGrappleCharacter::TryGrapple()
+FVector AGrappleCharacter::CalculateForwardForce()
 {
-	FHitResult hit(ForceInit);
+	return GetActorForwardVector() * ForwardMomentumWeight;
+}
 
-	// Find/validate player controller instance
-	if (!PlayerController)
+FHitResult AGrappleCharacter::TryGrapple()
+{
+	// Try to find grapple target using sphere trace
+	FHitResult hit = GetGrappleTarget(true);
+	
+	// Store grapple point
+	GrapplePoint = hit.ImpactPoint;
+	IsGrappling = hit.bBlockingHit;
+
+	// If valid hit returned, check if it's a MovingGrappleActor
+	AActor* hitActor = hit.GetActor();
+	if (IsGrappling && hitActor != nullptr)
 	{
-		return false;
+		UActorComponent* component = hitActor->FindComponentByClass(UMovingGrappleComponent::StaticClass());
+		if (component)
+		{
+			MovingGrappleComponent = Cast<UMovingGrappleComponent>(component);
+		}
 	}
 
-	// Initialize raycast values from player perspective
-	FVector traceStart;
-	FRotator traceDirection;
+	return hit;
+}
 
-	PlayerController->GetPlayerViewPoint(traceStart, traceDirection);
-	FVector traceEnd = traceStart + (traceDirection.Vector() * GrappleRange); // TODO: make distance a variable
-
-	FCollisionQueryParams traceParams(SCENE_QUERY_STAT(TryGrapple), true, GetInstigator());
-
-	// Perform sphere trace
-	//bool hitReturned = GetWorld()->SweepSingleByChannel(hit, traceStart, traceEnd, traceDirection.Quaternion(), ECC_Visibility, FCollisionShape::MakeSphere(SphereTraceRadius));
-	//if (hitReturned)
-	//{
-	//	FVector GrapplePoint = hit.ImpactPoint;
-	//}
-
-	TArray<AActor*> actorsToIgnore{ this };
-	bool hitReturned = UKismetSystemLibrary::SphereTraceSingle(GetWorld(), traceStart, traceEnd, SphereTraceRadius,
-		UEngineTypes::ConvertToTraceType(ECC_Visibility), false, actorsToIgnore, EDrawDebugTrace::None, hit, true);
-	
-	GrapplePoint = hit.ImpactPoint;
-	IsGrappling = hitReturned;
-
-	return hitReturned;
+void AGrappleCharacter::StopGrappling()
+{
+	// Clear grappling flag and MovingGrappleActor reference
+	IsGrappling = false;
+	MovingGrappleComponent = nullptr;
 }
 
 void AGrappleCharacter::SetJumpCurrentCount(int count)

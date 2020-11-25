@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "MovingGrappleComponent.h"
 #include "GrappleCharacter.generated.h"
 
 UCLASS()
@@ -14,6 +15,10 @@ class UNREALPROJECT_API AGrappleCharacter : public ACharacter
 public:
 	AGrappleCharacter();
 	//AGrappleCharacter(const FObjectInitializer& ObjectInitializer);
+
+	// Returns position grapple beam is currently hooked to
+	UPROPERTY(BlueprintReadOnly, Category = Grapple);
+	FVector GrapplePoint;
 
 	UPROPERTY(EditAnywhere, Category = Grapple);
 	float GrappleRange{ 1000.0f };
@@ -41,33 +46,43 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	UPROPERTY(BlueprintReadWrite, Category = Grapple);
+	UPROPERTY(BlueprintReadOnly, Category = Grapple);
 	bool IsGrappling{ false };
 	
 	APlayerController* PlayerController;
 
+	// Reference stored to MovingGrappleActor currently being grappled from, or nullptr
 	UPROPERTY(BlueprintReadOnly, Category = Grapple);
-	FVector GrapplePoint;
-
-	// Calculates force of grapple tension
-	FVector CalculateTensionForce();
+	UMovingGrappleComponent* MovingGrappleComponent;
 
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	// Calculates start/end positions for trace operations
+	void GetTraceParameters(FVector& traceStart, FVector& traceEnd);
+
 	/* Returns raycast hit result for a grapple target within GrappleRange in player-facing direction */
 	UFUNCTION(BlueprintCallable, Category = "Grapple")
-	bool TryGrapple();
+	FHitResult TryGrapple();
 
+	// Restores normal movement and clears grapple data (IsGrappling and MovingGrappleActor reference)
 	UFUNCTION(BlueprintCallable, Category = "Grapple")
-	FVector CalculateGrappleForce();
+	void StopGrappling();
+
+	// Calculates force of tension resulting from grappling
+	UFUNCTION(BlueprintCallable, Category = "Grapple")
+	FVector CalculateTensionForce();
+	
+	// Returns forward momentum boost when pressing W while grappling
+	UFUNCTION(BlueprintCallable, Category = "Grapple")
+	FVector CalculateForwardForce();
 
 	UFUNCTION(BlueprintCallable, Category = "Grapple")
 	void SetJumpCurrentCount(int count);
 
-	UFUNCTION(BlueprintCallable, Category = "UI")
-	bool CursorTargetInRange();
+	UFUNCTION(BlueprintCallable, Category = "Grapple")
+	FHitResult GetGrappleTarget(bool sphereTrace);
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
