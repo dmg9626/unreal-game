@@ -3,13 +3,22 @@
 #define print(text) UE_LOG(LogTemp, Warning, TEXT(text))
 #define printFString(text, fstring) UE_LOG(LogTemp, Warning, TEXT(text), fstring)
 #include "GrappleCharacter.h"
+#include "KillBoundsDetectionComponent.h"
 #include "UObject/UObjectBaseUtility.h"
 #include "Kismet/KismetSystemLibrary.h"
 
-// Initialize with our custom CharacterMovementComponent
-AGrappleCharacter::AGrappleCharacter()
+//// Initialize with our custom CharacterMovementComponent
+//AGrappleCharacter::AGrappleCharacter()
+//{
+//	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+//	PrimaryActorTick.bCanEverTick = true;
+//}
+
+AGrappleCharacter::AGrappleCharacter(const class FObjectInitializer& ObjectInitializer)
 {
- 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	ObjectInitializer.CreateDefaultSubobject<UKillBoundsDetectionComponent>(this, TEXT("KillBoundsDetection"));
+	
+	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 }
 

@@ -13,8 +13,9 @@ class UNREALPROJECT_API AGrappleCharacter : public ACharacter
 	GENERATED_BODY()
 
 public:
-	AGrappleCharacter();
-	//AGrappleCharacter(const FObjectInitializer& ObjectInitializer);
+	//AGrappleCharacter();
+	AGrappleCharacter(const FObjectInitializer& ObjectInitializer);
+
 
 	// Returns position grapple beam is currently hooked to
 	UPROPERTY(BlueprintReadOnly, Category = Grapple);
