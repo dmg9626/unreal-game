@@ -4,6 +4,7 @@
 #define printFString(text, fstring) UE_LOG(LogTemp, Warning, TEXT(text), fstring)
 #include "GrappleCharacter.h"
 #include "KillBoundsDetectionComponent.h"
+#include "PlayerAudioComponent.h"
 #include "UObject/UObjectBaseUtility.h"
 #include "Kismet/KismetSystemLibrary.h"
 
@@ -17,6 +18,7 @@
 AGrappleCharacter::AGrappleCharacter(const class FObjectInitializer& ObjectInitializer)
 {
 	ObjectInitializer.CreateDefaultSubobject<UKillBoundsDetectionComponent>(this, TEXT("KillBoundsDetection"));
+	ObjectInitializer.CreateDefaultSubobject<UPlayerAudioComponent>(this, TEXT("PlayerAudioComponent"));
 	
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
