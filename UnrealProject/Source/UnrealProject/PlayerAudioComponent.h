@@ -33,4 +33,7 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Audio")
 	float CalculateSpeedDirectionalNormalized(float MaxSpeed, FVector Direction);
+
+	UFUNCTION(BlueprintCallable, Category = "Audio")
+	void SpatializeAudio(float SpatialDistance, UAudioComponent* AudioComponent);
 };

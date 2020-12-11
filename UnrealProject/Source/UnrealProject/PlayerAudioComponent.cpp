@@ -4,6 +4,7 @@
 #define print(text) UE_LOG(LogTemp, Warning, TEXT(text))
 #define printFString(text, fstring) UE_LOG(LogTemp, Warning, TEXT(text), fstring)
 #include "PlayerAudioComponent.h"
+#include "Components/AudioComponent.h"
 
 
 // Sets default values for this component's properties
@@ -67,4 +68,20 @@ float UPlayerAudioComponent::CalculateSpeedDirectionalNormalized(float MaxSpeed,
 	printFString("SPEED = %f", dot);
 	printFString("NORMALIZED = %f", speedNormalized);
 	return speedNormalized;
+}
+
+
+void UPlayerAudioComponent::SpatializeAudio(float SpatialDistance, UAudioComponent* AudioComponent)
+{
+	// Get normalized direction of character movement
+	FVector direction = MoveComponent->GetLastUpdateVelocity().GetSafeNormal();
+
+
+	// Place audio component in direction of movement (spatializes wind, collision, etc)
+	FVector actorPosition = GetOwner()->GetActorLocation();
+	FTransform audioTransform = AudioComponent->GetComponentTransform();
+
+	FVector offset = direction * SpatialDistance;
+	printFString("%s", *direction.ToString());
+	audioTransform.SetLocation(actorPosition + (offset));
 }
