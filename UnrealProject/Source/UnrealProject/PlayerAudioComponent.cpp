@@ -48,12 +48,12 @@ float UPlayerAudioComponent::CalculateSpeedNormalized(float MaxSpeed)
 		return 0.0f;
 	}
 
+	// Scale speed down by 10
 	float speed = GetOwner()->GetVelocity().Size() / 10;
-	float speedNormalized = 1 - ((MaxSpeed - speed) / MaxSpeed);
-	//printFString("SPEED = %f", speed);
-	//printFString("NORMALIZED = %f", speedNormalized);
 
-	return speedNormalized;
+	// Normalize according to MaxSpeed
+	float speedNormalized = 1 - ((MaxSpeed - speed) / MaxSpeed);
+	return FMath::Abs(speedNormalized);
 }
 
 float UPlayerAudioComponent::CalculateSpeedDirectionalNormalized(float MaxSpeed, FVector Direction)
@@ -64,9 +64,6 @@ float UPlayerAudioComponent::CalculateSpeedDirectionalNormalized(float MaxSpeed,
 	
 	// Apply normalizing function
 	float speedNormalized = 1 - ((MaxSpeed - dot) / MaxSpeed);
-
-	printFString("SPEED = %f", dot);
-	printFString("NORMALIZED = %f", speedNormalized);
 	return speedNormalized;
 }
 
