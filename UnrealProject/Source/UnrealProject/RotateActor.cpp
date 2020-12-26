@@ -23,17 +23,4 @@ void ARotateActor::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (!TargetActor)
-		return;
-
-	// Get vector from target to self
-	FVector delta = GetActorLocation() - TargetActor->GetActorLocation();
-
-	// Rotate delta vector around our up axis
-	FVector newDelta = delta.RotateAngleAxis(DegreesPerSecond * DeltaTime, GetActorUpVector());
-
-	// Calculate new position relative to target
-	FVector newPosition = newDelta + TargetActor->GetActorLocation();
-	SetActorLocation(newPosition);
 }
-

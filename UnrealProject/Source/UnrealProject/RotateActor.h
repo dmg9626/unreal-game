@@ -15,13 +15,6 @@ public:
 	// Sets default values for this actor's properties
 	ARotateActor();
 
-	UPROPERTY(EditAnywhere, Category = Rotate);
-	AActor* TargetActor;
-
-	// Rotation speed (degrees/second)
-	UPROPERTY(EditAnywhere, Category = Rotate);
-	float DegreesPerSecond;
-
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;

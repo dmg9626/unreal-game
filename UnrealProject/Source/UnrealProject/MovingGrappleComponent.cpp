@@ -32,11 +32,10 @@ void UMovingGrappleComponent::SetGrapplePoint(FHitResult hit)
 		return;
 	}
 
+	// Store relative position of grapple point
 	RelativeGrapplePoint = hit.ImpactPoint - GetOwner()->GetActorLocation();
-}
 
-FVector UMovingGrappleComponent::GetUpdatedGrapplePoint()
-{
-	return GetOwner()->GetActorLocation() + RelativeGrapplePoint;
+	// Store rotation at beginning of grapple, so we can track change in rotation over time
+	InitialRotation = GetOwner()->GetActorRotation();
 }
 

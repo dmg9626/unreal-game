@@ -21,15 +21,16 @@ protected:
 	virtual void BeginPlay() override;
 
 	// Position (relative to local pivot) that grapple beam hooked onto
+	UPROPERTY(BlueprintReadOnly, Category = Grapple);
 	FVector RelativeGrapplePoint;
+
+	// Actor rotation when player started grappling
+	UPROPERTY(BlueprintReadOnly, Category = Grapple);
+	FRotator InitialRotation;
 
 public:	
 
 	// Called when player grapples onto this actor
 	UFUNCTION(BlueprintCallable, Category = "Grapple")
 	void SetGrapplePoint(FHitResult hit);
-
-	// Returns transformed grapple point
-	UFUNCTION(BlueprintCallable, Category = "Grapple")
-	FVector GetUpdatedGrapplePoint();
 };

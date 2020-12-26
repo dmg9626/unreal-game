@@ -79,6 +79,5 @@ void UPlayerAudioComponent::SpatializeAudio(float SpatialDistance, UAudioCompone
 	FTransform audioTransform = AudioComponent->GetComponentTransform();
 
 	FVector offset = direction * SpatialDistance;
-	printFString("%s", *direction.ToString());
 	audioTransform.SetLocation(actorPosition + (offset));
 }

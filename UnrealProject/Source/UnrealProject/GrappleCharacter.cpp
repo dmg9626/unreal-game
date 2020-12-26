@@ -36,12 +36,6 @@ void AGrappleCharacter::BeginPlay()
 void AGrappleCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
-	// Update GrapplePoint if hooked onto a moving actor
-	if (MovingGrappleComponent)
-	{
-		GrapplePoint = MovingGrappleComponent->GetUpdatedGrapplePoint();
-	}
 }
 
 void AGrappleCharacter::GetTraceParameters(FVector &traceStart, FVector &traceEnd)
@@ -132,7 +126,11 @@ FHitResult AGrappleCharacter::TryGrapple()
 		UActorComponent* component = hitActor->FindComponentByClass(UMovingGrappleComponent::StaticClass());
 		if (component)
 		{
-			MovingGrappleComponent = Cast<UMovingGrappleComponent>(component);
+			// Store reference to moving target
+			MovingGrappleTarget = Cast<UMovingGrappleComponent>(component);
+
+			// Pass hit result to target, so it can recalculate GrapplePoint according to movement/rotation
+			MovingGrappleTarget->SetGrapplePoint(hit);
 		}
 	}
 
@@ -141,9 +139,9 @@ FHitResult AGrappleCharacter::TryGrapple()
 
 void AGrappleCharacter::StopGrappling()
 {
-	// Clear grappling flag and MovingGrappleActor reference
+	// Clear grappling flag and MovingGrappleTarget reference
 	IsGrappling = false;
-	MovingGrappleComponent = nullptr;
+	MovingGrappleTarget = nullptr;
 }
 
 void AGrappleCharacter::SetJumpCurrentCount(int count)

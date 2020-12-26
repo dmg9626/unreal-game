@@ -16,9 +16,8 @@ public:
 	//AGrappleCharacter();
 	AGrappleCharacter(const FObjectInitializer& ObjectInitializer);
 
-
 	// Returns position grapple beam is currently hooked to
-	UPROPERTY(BlueprintReadOnly, Category = Grapple);
+	UPROPERTY(BlueprintReadWrite, Category = Grapple);
 	FVector GrapplePoint;
 
 	UPROPERTY(EditAnywhere, Category = Grapple);
@@ -52,9 +51,9 @@ protected:
 	
 	APlayerController* PlayerController;
 
-	// Reference stored to MovingGrappleActor currently being grappled from, or nullptr
+	// If currently grappling from an Actor with a MovingGrappleComponent, contains a reference to that component. Otherwise nullptr.
 	UPROPERTY(BlueprintReadOnly, Category = Grapple);
-	UMovingGrappleComponent* MovingGrappleComponent;
+	UMovingGrappleComponent* MovingGrappleTarget;
 
 public:	
 	// Called every frame
